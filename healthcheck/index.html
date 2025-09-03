@@ -1,0 +1,59 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Statut NTP</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #282c34;
+            color: #abb2bf;
+            display: grid;
+            place-content: center;
+            height: 100vh;
+            margin: 0
+        }
+
+        pre {
+            background: #21252b;
+            padding: 2em;
+            border-radius: 8px;
+            min-width: 60ch
+        }
+
+        h1 {
+            margin-bottom: 0.2em
+        }
+
+        .ok {
+            color: #98c379
+        }
+
+        .ko {
+            color: #e06c75
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Statut du serveur NTP</h1>
+    <pre id="status">Initialisation…</pre>
+    <script>
+        const el = document.getElementById("status");
+        async function tick() {
+            try {
+                const r = await fetch("/status.txt?t=" + Date.now());
+                const t = await r.text();
+                el.textContent = t;
+                const ok = t.includes("Leap status     : Normal");
+                el.className = ok ? "ok" : "ko";
+            } catch (e) {
+                el.textContent = "ERREUR : Impossible de charger le statut.";
+                el.className = "ko";
+            }
+        }
+        setInterval(tick, 2000); tick();
+    </script>
+</body>
+
+</html>

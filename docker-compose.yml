@@ -1,66 +1,49 @@
-# Version du fichier docker-compose.
-# Il est recommandé de spécifier une version récente.
-version: "3.8"
-
-# Définition des services (conteneurs) à lancer.
 services:
-  # Premier service : le serveur NTP lui-même.
   ntp:
-    # Nom de l'image Docker à utiliser.
-    image: instrumentisto/chrony
-    # Nom du conteneur pour une identification facile.
+    build:
+      context: ./ntp
+      dockerfile: Dockerfile
+    image: local/chrony:alpine-3.20
     container_name: ntp-server
-    # Politique de redémarrage : toujours relancer le conteneur sauf s'il est arrêté manuellement.
     restart: unless-stopped
-    # Mappage des ports : expose le port 123/UDP du conteneur sur le port 123/UDP de la machine hôte.
     ports:
       - "123:123/udp"
-    # Montage des volumes : lie le fichier de configuration local au fichier attendu dans le conteneur.
+      - "323:323/udp"
     volumes:
-      - ./chrony.conf:/etc/chrony/chrony.conf
-    # Ajout de capacités Linux : indispensable pour que Chrony puisse modifier l'heure système.
+      - ./ntp/chrony.conf:/etc/chrony/chrony.conf:ro
+      - chrony-data:/var/lib/chrony
     cap_add:
       - SYS_TIME
+    healthcheck:
+      test: ["CMD-SHELL", "chronyc -n tracking >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
 
-  # Deuxième service : la page web de vérification du statut.
   healthcheck:
-    # Nom de l'image Docker à utiliser (un serveur web Nginx léger).
-    image: nginx:alpine
+    build: ./healthcheck
+    image: local/ntp-health:alpine-3.20
     container_name: ntp-healthcheck
     restart: unless-stopped
-    # Mappage des ports : expose le serveur web sur le port 8080 de la machine hôte.
     ports:
-      - "8080:80"
-    # Dépend de 'ntp' : ce service ne démarrera qu'après que le service ntp ait démarré.
+      - "8123:80"
     depends_on:
       - ntp
-    # La commande qui s'exécute au lancement pour créer la page et le script de vérification.
-    command: >
-      /bin/sh -c "
-        apk add --no-cache chrony;
-        echo '<html><head><title>Statut NTP</title><style>body { font-family: monospace; background-color: #282c34; color: #abb2bf; display: grid; place-content: center; height: 100vh; margin: 0; } pre { background-color: #21252b; padding: 2em; border-radius: 8px; }</style></head><body><h1>Statut du serveur NTP</h1><pre id=\"status\">Chargement...</pre><script>
-          const statusEl = document.getElementById('status');
-          async function updateStatus() {
-            try {
-              const response = await fetch('/status.txt?t=' + new Date().getTime());
-              if (response.ok) {
-                const text = await response.text();
-                statusEl.textContent = text;
-                statusEl.style.color = text.includes('Leap status     : Normal') ? '#98c379' : '#e06c75';
-              } else {
-                statusEl.textContent = 'Erreur: Impossible de joindre le script de statut.';
-                statusEl.style.color = '#e06c75';
-              }
-            } catch (error) {
-              statusEl.textContent = 'Erreur de connexion...';
-              statusEl.style.color = '#e06c75';
-            }
-          }
-          setInterval(updateStatus, 2000);
-          updateStatus();
-        </script></body></html>' > /usr/share/nginx/html/index.html;
-        while true; do
-          chronyc -h ntp tracking > /usr/share/nginx/html/status.txt || echo 'ERREUR : Le serveur NTP est inaccessible.' > /usr/share/nginx/html/status.txt;
-          sleep 2;
-        done
-      "
+    environment:
+      - NTP_TARGET=ntp
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/status.txt | grep -Eq 'Leap status *: Normal|ERREUR'"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+volumes:
+  chrony-data:
