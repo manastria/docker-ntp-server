@@ -7,8 +7,8 @@ Il inclut un serveur **NTP (Network Time Protocol)** basé sur Chrony ainsi qu'u
 ## Fonctionnalités
 
 * **Serveur NTP robuste** : Utilise [Chrony](https://chrony.tuxfamily.org/), une implémentation moderne et performante de NTP.
-* **Facile à déployer** : Une seule commande `docker-compose up -d` pour tout lancer.
-* **Statut en temps réel** : Une page web sur le port `80123` affiche l'état de la synchronisation du serveur, avec un code couleur pour un diagnostic immédiat.
+* **Facile à déployer** : Une seule commande `docker compose up -d` pour tout lancer.
+* **Statut en temps réel** : Une page web sur le port `8123` affiche l'état de la synchronisation du serveur, avec un code couleur pour un diagnostic immédiat.
 * **Portable et isolé** : L'ensemble fonctionne dans des conteneurs Docker, sans rien installer directement sur la machine hôte (à l'exception de Docker).
 * **Pensé pour l'enseignement** : Permet de fournir un service NTP centralisé pour des labs réseau, des exercices sur la synchronisation, etc.
 * **Autonome et résilient** : Peut fonctionner sans dépendances externes, garantissant ainsi une disponibilité maximale.
@@ -27,7 +27,7 @@ Il inclut un serveur **NTP (Network Time Protocol)** basé sur Chrony ainsi qu'u
 1. **Clonez ou téléchargez ce projet.**
 
 2. **Configurez le réseau du labo :**
-    Ouvrez le fichier `chrony.conf` et modifiez la ligne `allow` pour qu'elle corresponde au plan d'adressage IP de votre réseau local. Par exemple, si votre réseau est `10.10.0.0/16` :
+    Ouvrez le fichier `chrony.conf` et adaptez la configuration `allow` pour qu'elle corresponde au plan d'adressage IP de votre réseau local. Par exemple, si votre réseau est `10.10.0.0/16` :
 
     ```ini
     # Autoriser les clients du réseau du labo (à adapter)
@@ -38,7 +38,7 @@ Il inclut un serveur **NTP (Network Time Protocol)** basé sur Chrony ainsi qu'u
     Ouvrez un terminal dans le dossier du projet et exécutez la commande :
 
     ```bash
-    docker-compose up -d
+    docker compose up -d
     ```
 
     Les deux conteneurs (serveur NTP et page de statut) vont démarrer en arrière-plan.
@@ -52,7 +52,7 @@ Il inclut un serveur **NTP (Network Time Protocol)** basé sur Chrony ainsi qu'u
 Une fois le serveur démarré, vous pouvez :
 
 1. **Vérifier le statut du serveur :**
-    Ouvrez un navigateur web et rendez-vous à l'adresse `http://<IP_DU_POSTE_SERVEUR>:80123`. Vous y verrez l'état de la synchronisation. Si le statut `Leap status` est `Normal`, tout est bon !
+    Ouvrez un navigateur web et rendez-vous à l'adresse `http://<IP_DU_POSTE_SERVEUR>:8123`. Vous y verrez l'état de la synchronisation. Si le statut `Leap status` est `Normal`, tout est bon !
 
 2. **Configurer votre client NTP :**
     Pour synchroniser votre machine (VM, conteneur, etc.) sur ce serveur, utilisez l'adresse IP du serveur comme source de temps. Sur un système Linux, éditez le fichier `/etc/chrony/chrony.conf` ou `/etc/ntp.conf` pour y mettre :
@@ -70,29 +70,29 @@ Toutes les commandes doivent être lancées depuis le dossier du projet.
 * **Démarrer les services :**
 
     ```bash
-    docker-compose up -d
+    docker compose up -d
     ```
 
 * **Vérifier l'état des conteneurs :**
 
     ```bash
-    docker-compose ps
+    docker compose ps
     ```
 
 * **Consulter les logs en temps réel :**
 
     ```bash
     # Pour le serveur NTP
-    docker-compose logs -f ntp
+    docker compose logs -f ntp
 
     # Pour la page de statut
-    docker-compose logs -f healthcheck
+    docker compose logs -f healthcheck
     ```
 
 * **Arrêter et supprimer les conteneurs :**
 
     ```bash
-    docker-compose down
+    docker compose down
     ```
 
 -----
