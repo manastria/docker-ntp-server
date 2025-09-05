@@ -8,7 +8,7 @@ Il inclut un serveur **NTP (Network Time Protocol)** basé sur Chrony ainsi qu'u
 
 * **Serveur NTP robuste** : Utilise [Chrony](https://chrony.tuxfamily.org/), une implémentation moderne et performante de NTP.
 * **Facile à déployer** : Une seule commande `docker-compose up -d` pour tout lancer.
-* **Statut en temps réel** : Une page web sur le port `8080` affiche l'état de la synchronisation du serveur, avec un code couleur pour un diagnostic immédiat.
+* **Statut en temps réel** : Une page web sur le port `80123` affiche l'état de la synchronisation du serveur, avec un code couleur pour un diagnostic immédiat.
 * **Portable et isolé** : L'ensemble fonctionne dans des conteneurs Docker, sans rien installer directement sur la machine hôte (à l'exception de Docker).
 * **Pensé pour l'enseignement** : Permet de fournir un service NTP centralisé pour des labs réseau, des exercices sur la synchronisation, etc.
 * **Autonome et résilient** : Peut fonctionner sans dépendances externes, garantissant ainsi une disponibilité maximale.
@@ -52,7 +52,7 @@ Il inclut un serveur **NTP (Network Time Protocol)** basé sur Chrony ainsi qu'u
 Une fois le serveur démarré, vous pouvez :
 
 1. **Vérifier le statut du serveur :**
-    Ouvrez un navigateur web et rendez-vous à l'adresse `http://<IP_DU_POSTE_SERVEUR>:8080`. Vous y verrez l'état de la synchronisation. Si le statut `Leap status` est `Normal`, tout est bon !
+    Ouvrez un navigateur web et rendez-vous à l'adresse `http://<IP_DU_POSTE_SERVEUR>:80123`. Vous y verrez l'état de la synchronisation. Si le statut `Leap status` est `Normal`, tout est bon !
 
 2. **Configurer votre client NTP :**
     Pour synchroniser votre machine (VM, conteneur, etc.) sur ce serveur, utilisez l'adresse IP du serveur comme source de temps. Sur un système Linux, éditez le fichier `/etc/chrony/chrony.conf` ou `/etc/ntp.conf` pour y mettre :
