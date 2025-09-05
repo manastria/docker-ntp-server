@@ -2,7 +2,7 @@
 
 Ce projet déploie un serveur de temps NTP local et fiable via Docker. Il est conçu pour les environnements où la connectivité Internet est limitée ou instable, comme des salles de travaux pratiques.
 
-Il inclut un serveur **NTP (Network Time Protocol)** basé sur Chrony ainsi qu'une **page web de statut** simple et visuelle pour permettre aux utilisateurs de vérifier en temps réel que le service est fonctionnel.
+Il inclut un serveur **NTP (_Network Time Protocol_)** basé sur Chrony ainsi qu'une **page web de statut** simple et visuelle pour permettre aux utilisateurs de vérifier en temps réel que le service est fonctionnel.
 
 ## Fonctionnalités
 
